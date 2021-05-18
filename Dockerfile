@@ -10,6 +10,6 @@ COPY . .
 COPY --from=base /app/venv/ /app/venv
 RUN chmod +x /app/entrypoint.sh
 ENV GUNICORN_WORKERS=1
-ENV KEY_STORAGE="http://127.0.0.1:8000"
+ENV KEY_STORAGE="http://127.0.0.1:8000/"
 EXPOSE 8000
 ENTRYPOINT ["/app/entrypoint.sh"]
