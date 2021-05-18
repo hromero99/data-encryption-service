@@ -1,19 +1,24 @@
 from Crypto.PublicKey import RSA
-from Crypto.Signature import PKCS1_v1_5
-from Crypto.Hash import SHA
+from Crypto.Cipher import PKCS1_v1_5 as Cipher_PKCS1_v1_5
+import secrets
 
 class EncryptorManager(object):
-    # Class to manage the encription actions
 
-    def generate_rsa_key(self,):
-        key = RSA.generate(2048)
-        return key.exportKey()
-    
-    
-    def encrypt_rsa_msg(self,msg:str,key) -> str:
-        try:
-            load = RSA.import_key("key.pub")
-            
-        except ValueError as error:
-            return error
-    
+    def __init__(self, public_key: str = None, private_key: str = None):
+        if public_key:
+            self.p_key = RSA.import_key(public_key)
+        if private_key:
+            self.private_key = RSA.import_key(private_key)
+
+    def encrypt(self, msg: str) -> str:
+        cipher = Cipher_PKCS1_v1_5.new(self.p_key)
+        t_seed = secrets.token_hex(16)
+        with open(f"/tmp/{t_seed}", "wb") as encrypted:
+            encrypted.write(cipher.encrypt(msg.encode()))
+            encrypted.close()
+        return t_seed
+
+    def decrypt(self, encrypted: bytes):
+        decipher = Cipher_PKCS1_v1_5.new(self.private_key)
+        return decipher.decrypt(encrypted, None).decode()
+
