@@ -1,9 +1,10 @@
-from flask import Flask, url_for
+from flask import Flask
 from flask import jsonify
 from flask import request
 from flask import send_from_directory
-from encrypt import EncryptorManager
+from utils.encryptManager import EncryptorManager
 from utils import KeysRepository
+from utils import UploadManager
 import os
 
 app = Flask(__name__)
@@ -21,6 +22,7 @@ def encrypt_message():
     key = KeysRepository().get_public_key(device_id=request_data.get("device_id"))
     if key:
         encrypted = EncryptorManager(public_key=key).encrypt(msg=request_data.get("message"))
+        UploadManager().upload_file(f"/tmp/{encrypted}")
         return send_from_directory("/tmp/", encrypted, as_attachment=True)
     return {"error": "Error query for public key"}
 
